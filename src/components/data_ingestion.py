@@ -9,6 +9,9 @@ from dataclasses import dataclass
 
 from src.components.data_transformation import DataTransformation
 from src.components.data_transformation import DataTransformationConfig
+
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
  
 @dataclass
 class DataIngestionConfig:
@@ -47,10 +50,18 @@ class DataIngestion:
         except Exception as e:
             raise CustomException(e,sys)
         
-if __name__=="__main__":
+if __name__=="__main__": # this basically like the main method ie entry point of the program(means run this code only when this file is executed directly)
     obj=DataIngestion()
     train_data,test_data=obj.initiate_data_ingestion()
+    # reads raw dataset, splits into train/test, saves CSV files
+    # returns: train_data → "artifacts/train.csv", test_data  → "artifacts/test.csv"
 
     data_transformation=DataTransformation()
     train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data,test_data)
+    # loads CSV, applies preprocessing (scaling, encoding), converts to arrays
+    # returns: train_arr → processed training data, test_arr  → processed testing data, _ → path of preprocessor (ignored)
+
+    modeltrainer=ModelTrainer()
+    print(modeltrainer.initiate_model_trainer(train_arr,test_arr))
+    # tries multiple ML models, finds best one, saves it (model.pkl), calculates accuracy (R² score), print(...) shows performance
 
